@@ -1,0 +1,26 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python generated files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Jupyter generated files
+.ipynb_checkpoints/
+
+# Evaluation outputs
+evaluation_results.json
+
+# Operating system files
+.DS_Store
+Thumbs.db
