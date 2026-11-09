@@ -1,118 +1,121 @@
-# PL Capital – AI Portfolio Analytics Agent
+# PL Capital — AI Portfolio Analytics Agent
 
-An AI-powered portfolio analytics system that translates natural-language questions into database queries, calculates sector exposures, and provides portfolio health and risk insights through an interactive dashboard.
+An AI-powered portfolio analytics system that translates natural-language questions into database queries, calculates sector exposures, and provides portfolio health, risk and reconciliation insights through an interactive dashboard.
 
 ## 1. Project Overview
 
-The **PL Capital AI Portfolio Analytics Agent** is designed to make portfolio data easier to query and understand.
+The **PL Capital AI Portfolio Analytics Agent** makes portfolio data easier to query and understand.
 
-Users can ask questions in natural language, allowing the AI agent to select and execute the appropriate analytical tool. The system combines Gemini function calling, SQLite database operations and Python-based financial analytics.
+Users ask questions in natural language. The AI agent selects and executes the appropriate analytical tool, combining Gemini function calling, a deterministic offline router, SQLite database operations and Python-based financial analytics.
 
-In addition to the required SQL and sector exposure tools, the project includes portfolio health analysis, risk analysis, portfolio comparison and a Streamlit dashboard.
+The project implements six analytical tools, a hybrid routing architecture, portfolio reconciliation, a six-page Streamlit dashboard, and a comprehensive automated test suite.
 
 ## 2. Key Features
 
 ### AI-Powered Querying
-- Converts natural-language questions into SQL queries.
-- Uses Gemini function calling to select the appropriate tool.
-- Executes database queries and returns understandable responses.
-- Maintains tool execution details for inspection.
+- Converts natural-language questions into SQL queries or tool calls.
+- Uses a **hybrid routing architecture**: deterministic offline rules for high-confidence patterns, Gemini function calling for complex or ambiguous queries.
+- Maintains conversation history.
+- Tool execution details are visible and inspectable.
 
 ### Sector Exposure Calculator
-- Calculates sector-wise portfolio exposure.
-- Combines holding weights with security-sector mappings.
-- Excludes bond holdings and considers equities only.
-- Reports sector exposure percentages.
+- Calculates sector-wise portfolio equity exposure from holding weights and security-sector mappings.
+- Excludes bond holdings. Reports sector exposure percentages.
 
 ### Portfolio Health Analysis
-- Analyzes portfolio allocation and sector concentration.
-- Evaluates available performance and risk metrics.
-- Identifies potential portfolio health alerts.
-- Handles missing analytical data.
+- Computes a documented health score (0–100) based on risk alerts, HHI concentration, and data availability.
+- Returns health tier: healthy (≥80), moderate (55–79), needs attention (<55).
+- Identifies risk and data-quality alerts.
 
 ### Risk Intelligence
-- Analyzes available portfolio risk metrics.
-- Identifies risk levels and potential concentration concerns.
-- Provides risk-related alerts.
+- Computes a documented risk score (0–100, lower = more risk).
+- Returns risk tier capped by the authoritative signal level: a high risk alert always forces "aggressive" tier regardless of numeric score.
+- Reports data completeness percentage and assessment confidence.
+- Never hides a high risk signal behind a high score.
 
 ### Portfolio Comparison
-- Compares two portfolios across available performance and risk metrics.
-- Compares asset allocation and sector exposure.
-- Highlights differences in concentration and data availability.
+- Compares nine performance and risk metrics with documented winner logic.
+- A winner requires ≥60% metric coverage, ≥4 comparable metrics, and a win margin ≥2.
+- Returns `no_defensible_winner` when evidence is insufficient.
+- Distinguishes actual zero from unavailable data in allocation and sector comparisons.
+
+### Portfolio Reconciliation
+- Reconciles recorded holding weights against market-value-computed weights.
+- Partial denominators are never normalised: if any holding is missing a price or quantity, no holding receives a computed weight.
+- Returns explicit statuses: MATCHED, OBSERVATION, DISCREPANCY_FOUND, INCOMPLETE, INVALID_DATA.
+- Distinguishes missing AUM from invalid AUM.
+- Provides a cost-basis diagnostic comparison.
 
 ### Interactive Dashboard
-The Streamlit dashboard provides five pages:
+Six Streamlit pages:
 
-1. **Overview:** Portfolio-level analytics and key indicators.
-2. **Portfolio Explorer:** Portfolio holdings, allocation and sector exposure.
-3. **Risk Intelligence:** Risk metrics and portfolio risk insights.
-4. **Portfolio Comparison:** Side-by-side portfolio analysis.
-5. **AI Analyst:** Natural-language interaction with the portfolio agent.
+| Page | Description |
+|---|---|
+| **Executive Overview** | Portfolio count, AUM, health distribution, Beta alerts, risk table |
+| **Portfolio Explorer** | Holdings, allocation, sector exposure, performance and risk metrics |
+| **Risk Intelligence** | Risk score, tier, signal, confidence, data completeness |
+| **Portfolio Comparison** | Side-by-side comparison with coverage and winner/no-winner logic |
+| **AI Analyst** | Natural-language conversational interface with tool visibility |
+| **Reconciliation** | Weight drift, allocation drift, AUM coverage, validation errors |
 
 ## 3. System Architecture
 
-The application follows a modular architecture that separates AI orchestration, database operations, financial calculations and presentation.
-
-```mermaid
-flowchart TD
-    A[User Query] --> B[Portfolio Agent]
-    B --> C[Gemini Function Calling]
-    C --> D{Select Tool}
-    D --> E[SQL Query Tool]
-    D --> F[Sector Exposure Calculator]
-    D --> G[Portfolio Health]
-    D --> H[Risk Analyzer]
-    D --> I[Portfolio Comparison]
-    E --> J[SQLite Database]
-    F --> J
-    G --> J
-    H --> J
-    I --> J
-    J --> K[Tool Results]
-    K --> L[Gemini Response]
-    L --> M[User]
-    J --> N[Streamlit Dashboard]
+```
+User Query → AI Analyst
+               ↓
+    Hybrid Router
+    ├─ Deterministic (offline): exact/partial match → tool
+    └─ Gemini LLM: ambiguous → model selects tool
+               ↓
+    ┌────────────────────────────────────────────┐
+    │              6 Analytical Tools            │
+    │  SQL · Exposure · Health · Risk            │
+    │  Comparison · Reconciliation               │
+    └────────────────────────────────────────────┘
+               ↓
+    SQLite (read-only, authorizer-protected)
+               ↓
+    Structured result → Dashboard display
 ```
 
 ### Agent Tools
 
-The agent registers five tools:
-
 | Tool | Responsibility |
 |---|---|
-| `run_sql_query` | Executes validated, read-only SQL queries |
-| `calculate_sector_exposure` | Calculates equity sector exposures |
-| `analyze_portfolio_health` | Evaluates portfolio health |
-| `analyze_portfolio_risk` | Analyzes portfolio risk |
-| `compare_portfolios` | Compares two portfolios |
-
-Gemini determines which tool is appropriate for a user query and invokes the registered function.
+| `run_sql_query` | Validated, read-only SQL SELECT queries |
+| `calculate_sector_exposure` | Equity sector exposures per portfolio |
+| `analyze_portfolio_health` | Portfolio health score and alerts |
+| `analyze_portfolio_risk` | Risk score, tier, signal, completeness |
+| `compare_portfolios` | Coverage-aware two-portfolio comparison |
+| `reconcile_portfolio` | Holding weight reconciliation and drift analysis |
 
 ## 4. Technology Stack
 
 | Technology | Purpose |
 |---|---|
-| Python | Application development |
+| Python 3.10+ | Application development |
 | Google Gemini API | AI reasoning and function calling |
-| Google GenAI SDK | Gemini API integration |
+| google-genai SDK | Gemini API integration |
 | SQLite | Portfolio database |
-| Pandas | Data processing and analysis |
+| Pandas | Data processing |
 | Plotly | Interactive visualizations |
-| Streamlit | Dashboard development |
+| Streamlit | Dashboard |
 | Pytest | Automated testing |
 
 ## 5. Project Structure
 
-```text
+```
 PL-Capital-Portfolio-Analytics-Agent/
 │
 ├── dashboard/
-│   ├── app.py
+│   ├── app.py                        # Executive Overview
+│   ├── pl_theme.py                   # Shared theme, CSS, utilities
 │   └── pages/
 │       ├── 1_Portfolio_Explorer.py
 │       ├── 2_Risk_Intelligence.py
 │       ├── 3_Portfolio_Comparison.py
-│       └── 4_AI_Analyst.py
+│       ├── 4_AI_Analyst.py
+│       └── 5_Reconciliation.py
 │
 ├── data/
 │   ├── benchmarks.csv
@@ -126,254 +129,158 @@ PL-Capital-Portfolio-Analytics-Agent/
 │   └── transactions.csv
 │
 ├── src/
-│   ├── agent.py
-│   ├── database.py
-│   ├── evaluator.py
-│   ├── exposure_calculator.py
-│   ├── main.py
-│   ├── portfolio_comparison.py
-│   ├── portfolio_health.py
-│   ├── risk_analyzer.py
-│   ├── run_evaluation.py
-│   └── sql_tool.py
+│   ├── agent.py                      # AI orchestrator
+│   ├── cache.py                      # TTL cache
+│   ├── database.py                   # Read-only SQL with authorizer
+│   ├── evaluator.py                  # Ground-truth evaluator
+│   ├── exposure_calculator.py        # Sector exposure
+│   ├── logger.py                     # Structured JSON logger
+│   ├── main.py                       # CLI entry point
+│   ├── portfolio_comparison.py       # Coverage-aware comparison
+│   ├── portfolio_health.py           # Health score
+│   ├── reconciliation.py             # Weight reconciliation
+│   ├── risk_analyzer.py              # Risk score and tier
+│   ├── router.py                     # Deterministic routing
+│   ├── run_evaluation.py             # Evaluation runner
+│   └── sql_tool.py                   # SQL generation
 │
 ├── tests/
-│   └── test_backend.py
+│   ├── test_backend.py               # 18 core backend tests
+│   ├── test_hybrid_router.py         # 10 routing tests
+│   ├── test_sql_security.py          # 8 SQL security tests
+│   ├── test_evaluation.py            # 8 offline evaluation tests
+│   ├── test_reconciliation.py        # 10 reconciliation tests
+│   ├── test_enhanced_analytics.py    # 17 analytics tests
+│   ├── test_adversarial.py           # 94 adversarial tests
+│   └── test_dashboard_route_label.py # 13 route-label tests
 │
-├── portfolio_database.db
+├── portfolio_database.db             # SQLite — 13 portfolios, 9 tables
 ├── database_schema.sql
-├── ground_truth_dataset.json
+├── ground_truth_dataset.json         # 10-question evaluation dataset
 ├── requirements.txt
-├── README.md
-└── .gitignore
+├── run_tests.py                      # Portable test runner
+├── verify_protected_files.py         # SHA-256 integrity checker
+├── reconciliation_report.txt         # Full 13-portfolio reconciliation
+├── CHANGELOG.md
+├── FINAL_VERIFICATION.md
+└── DEMO_GUIDE.md
 ```
 
-## 6. Database and Data Handling
+## 6. Database and Data
 
-The project uses SQLite as its relational database.
+The project uses SQLite with nine tables: portfolios, sectors, securities, holdings, transactions, benchmarks, historical_prices, portfolio_performance, risk_metrics.
 
-The repository includes a prebuilt `portfolio_database.db`, so database initialization from the CSV files is not required for normal execution.
-
-The database contains nine tables:
-
-- Portfolios
-- Sectors
-- Securities
-- Holdings
-- Transactions
-- Benchmarks
-- Historical Prices
-- Portfolio Performance
-- Risk Metrics
-
-The SQL execution layer uses read-only database access and validates queries before execution.
+The SQL execution layer uses:
+- Read-only URI mode (`file:...?mode=ro`)
+- `PRAGMA query_only = ON`
+- A custom authorizer that denies all non-SELECT operations and restricts reads to the nine allowed tables
+- Query length, result-row and opcode limits
 
 ## 7. Installation and Configuration
 
 ### Prerequisites
-
 - Python 3.10 or later
-- Git
-- Google AI Studio API key
+- Google AI Studio API key (optional — offline mode works without it)
 
 ### Step 1: Clone the repository
-
 ```bash
 git clone https://github.com/prataprishi0707/PL-Capital-Portfolio-Analytics-Agent.git
-
 cd PL-Capital-Portfolio-Analytics-Agent
 ```
 
 ### Step 2: Install dependencies
-
 ```bash
 pip install -r requirements.txt
 ```
 
-### Step 3: Configure the Gemini API key
+### Step 3: Configure the Gemini API key (optional)
+```bash
+# Windows
+set GOOGLE_API_KEY=your_key_here
 
-Obtain an API key from [Google AI Studio](https://aistudio.google.com/).
-
-Set the environment variable `GOOGLE_API_KEY`.
-
-**Windows PowerShell:**
-
-```powershell
-$env:GOOGLE_API_KEY="YOUR_API_KEY"
+# Linux / macOS
+export GOOGLE_API_KEY=your_key_here
 ```
 
-**Linux / macOS:**
+Set `GEMINI_MODEL` to override the default model (gemini-2.5-flash).
+
+Do not commit API keys to the repository.
+
+### Step 4: Launch the dashboard
+```bash
+python -m streamlit run dashboard/app.py
+```
+
+The dashboard opens at `http://localhost:8501`.
+
+### Step 5: Run CLI agent (optional)
+```bash
+python src/main.py --question "How many portfolios are in the database?"
+```
+
+## 8. Running Tests
 
 ```bash
-export GOOGLE_API_KEY="YOUR_API_KEY"
+# Portable unittest runner (Windows-compatible)
+python run_tests.py
+
+# pytest
+python -m pytest tests/ -q
 ```
 
-Do not commit API keys or other credentials to GitHub.
+**178 tests pass.** Breakdown:
 
-### Step 4: Verify the database
-
-Ensure that `portfolio_database.db` exists in the project root.
-
-The application uses this existing database directly.
-
-## 8. Running the Application
-
-### Run the command-line AI agent
-
-```bash
-python src/main.py
-```
-
-Ask a specific question:
-
-```bash
-python src/main.py --question "How many portfolios are stored in the database?"
-```
-
-Example verified interaction:
-
-**User Query:**
-
-How many portfolios are stored in the database?
-
-**Selected Tool:**
-
-`run_sql_query`
-
-**Generated SQL:**
-
-```sql
-SELECT COUNT(*) AS total_portfolios
-FROM portfolios;
-```
-
-**Database Result:**
-
-13 portfolios.
-
-This example represents one successfully verified end-to-end Gemini function-calling interaction.
-
-### Run the Streamlit dashboard
-
-```bash
-streamlit run dashboard/app.py
-```
-
-The dashboard will be accessible at the local URL provided by Streamlit, usually:
-
-```text
-http://localhost:8501
-```
+| File | Tests |
+|---|---|
+| test_backend.py | 18 |
+| test_hybrid_router.py | 10 |
+| test_sql_security.py | 8 |
+| test_evaluation.py | 8 |
+| test_reconciliation.py | 10 |
+| test_enhanced_analytics.py | 17 |
+| test_adversarial.py | 94 |
+| test_dashboard_route_label.py | 13 |
+| **Total** | **178** |
 
 ## 9. Agent Evaluation
-
-The project includes a ground-truth dataset and an automated evaluation framework.
-
-The evaluator checks:
-- Whether the agent selects the expected tool.
-- Whether SQL query results match the expected database results.
-- Whether calculated sector exposures match independently calculated reference values.
-
-### Run the complete evaluation
 
 ```bash
 python src/run_evaluation.py
 ```
 
-### Evaluate a limited number of questions
+Requires `GOOGLE_API_KEY`. Evaluates tool selection and SQL accuracy against `ground_truth_dataset.json`.
 
-```bash
-python src/run_evaluation.py --limit 3
-```
+Offline evaluation (no API key) tests the evaluator infrastructure and both exposure questions: `python -m pytest tests/test_evaluation.py -v`.
 
-Evaluation results are saved to `evaluation_results.json`.
+## 10. Verified Capabilities
 
-The evaluation framework distinguishes functional failures from API availability errors.
-
-## 10. Testing and Verification
-
-The project includes automated backend regression tests and additional validation checks.
-
-### Run backend tests
-
-```bash
-python -m pytest tests/ -v
-```
-
-### Verified Development Results
-
-| Test / Verification | Result |
+| Capability | Status |
 |---|---|
-| SQL Query Tool smoke test | Passed |
-| Exposure Calculator smoke test | Passed |
-| Portfolio Health smoke test | Passed |
-| Portfolio Comparison smoke test | Passed |
-| Risk Analyzer smoke test | Passed |
-| Backend regression tests | 18/18 passed |
-| Result comparison unit tests | 5/5 passed |
-| Exposure ground-truth tests | 2/2 passed |
-| Offline tool-selection logic tests | 5/5 passed |
-| API-error classification tests | 6/6 passed |
-| SQL write-operation rejection | Passed |
-| Multiple-statement rejection | Passed |
-| Database integrity verification | Passed |
-| Agent tool registration | 5 tools registered |
-| Dashboard Python syntax | 5/5 files passed |
-| Streamlit health endpoint | HTTP 200 |
-| Dashboard browser review | All five pages checked |
+| SQL read-only security (INSERT/UPDATE/DELETE/DROP rejected) | ✅ Verified |
+| Sector exposure calculator | ✅ Verified |
+| Portfolio health with documented score formula | ✅ Verified |
+| Risk score capped by authoritative signal level | ✅ Verified |
+| Coverage-aware comparison with documented thresholds | ✅ Verified |
+| Partial-denominator reconciliation (never normalises incomplete data) | ✅ Verified |
+| Invalid AUM distinguished from missing AUM | ✅ Verified |
+| Overflow safety in all three numeric helpers | ✅ Verified |
+| Offline deterministic routing (no API key needed) | ✅ Verified |
+| Streamlit dashboard startup (HTTP 200) | ✅ Verified |
+| Full browser UI interaction | ⚠️ Not independently verified |
+| Live Gemini API evaluation | ⚠️ Requires GOOGLE_API_KEY |
 
-### SQL Safety Verification
+## 11. Known Limitations
 
-The SQL execution layer was tested against:
+- **Live Gemini evaluation**: The 10-question ground-truth evaluation requires a valid `GOOGLE_API_KEY`. The offline evaluation infrastructure passes 8/8 offline checks.
+- **Browser interaction**: Streamlit HTTP 200 is confirmed. Full chart rendering, dropdown interaction and AI Analyst conversation flow require manual browser testing.
+- **Reconciliation discrepancies**: 12/13 portfolios show `DISCREPANCY_FOUND` because `current_price` in the securities table has moved since `current_weight` was calibrated. This is a property of the static historical dataset and is reported honestly.
+- **Risk score boundary**: The numeric score thresholds and alert thresholds are independently calibrated. At exact boundaries they can differ, but the authoritative signal-capping mechanism ensures a high alert always forces `aggressive` tier.
+- **Historical data**: All metrics are sourced from the supplied historical assessment dataset. The system is not connected to live market prices or portfolio feeds.
 
-- INSERT, UPDATE and DELETE operations.
-- DROP TABLE, ALTER TABLE and CREATE TABLE operations.
-- Write-style PRAGMA operations.
-- Multiple SQL statements in one request.
-- Invalid table references.
+## 12. Security Properties
 
-All tested write attempts and multiple-statement requests were rejected.
-
-Database integrity verification confirmed that:
-- All 13 portfolio records remained present.
-- All nine original database tables remained present.
-- PRAGMA user_version remained unchanged at 0.
-
-## 11. Evaluation Status and Limitations
-
-The following development checks have been completed:
-
-- 18/18 automated backend tests passed.
-- 5/5 result comparison unit tests passed.
-- Both exposure ground-truth tests passed.
-- Offline tool-selection logic tests passed.
-- API-error classification tests passed.
-- One successful end-to-end Gemini SQL function-calling interaction returned the correct result.
-
-**Live AI evaluation limitation:**
-
-The complete 10-question ground-truth evaluation has not yet been verified. Subsequent Gemini API requests encountered HTTP 503 service-unavailability errors before tool selection.
-
-Therefore:
-- No overall live agent accuracy percentage is claimed.
-- Live exposure-tool selection remains unverified.
-- Offline backend and evaluator tests are reported separately from live AI evaluation.
-
-**Data limitations:**
-
-- Portfolio performance and risk records are historical sample data, not live market data.
-- Risk thresholds and alerts are illustrative and should not be interpreted as official investment or risk-management limits.
-- The project is an analytics demonstration, not an investment recommendation system.
-
-## 12. Future Improvements
-
-Potential future enhancements include:
-
-- More comprehensive live agent evaluation.
-- Hybrid questions requiring multiple tools.
-- Improved SQL query performance evaluation.
-- Caching for repeated analytical queries.
-- Expanded logging and monitoring.
-- REST API integration.
-- Multi-user support.
-- Additional portfolio analytics and visualization capabilities.**
+- All SQL queries are validated before execution.
+- Only SELECT and WITH (CTE) statements are permitted.
+- An authorizer restricts table access to the nine named tables.
+- The `GOOGLE_API_KEY` is read from an environment variable only — never hardcoded.
+- No credentials, API keys or `.env` files are committed to the repository.

@@ -1,26 +1,95 @@
-# Environment variables and secrets
+# ── Secrets and credentials ───────────────────────────────────────────────────
 .env
 .env.*
 !.env.example
 *.pem
 *.key
+*_credentials*
+*_secret*
 
-# Python generated files
+# ── Python generated files ────────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
 *.pyo
+*.pyd
+.Python
 
-# Virtual environments
+# ── Virtual environments ──────────────────────────────────────────────────────
 venv/
 .venv/
 env/
+ENV/
 
-# Jupyter generated files
+# ── Testing caches ────────────────────────────────────────────────────────────
+.pytest_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# ── Jupyter ───────────────────────────────────────────────────────────────────
 .ipynb_checkpoints/
 
-# Evaluation outputs
+# ── Log files ─────────────────────────────────────────────────────────────────
+logs/
+*.log
+
+# ── Evaluation outputs ────────────────────────────────────────────────────────
 evaluation_results.json
 
-# Operating system files
+# ── Backup files created during development ───────────────────────────────────
+*.bak
+*.bak2
+*.v1bak
+*.v2bak
+*.v3bak
+*.showcase_bak
+*.fix1bak
+*.final_bak
+*.before_history_restore
+*.before_hybrid_routing
+*.before_routing_fix
+*.before_comparison_upgrade
+
+# ── Session-specific diagnostic and build scripts ────────────────────────────
+audit_formulas.py
+check_gemini_model.py
+check_syntax.py
+final_syntax_check.py
+full_reconciliation_report.py
+inspect_genai_models.py
+inspect_risk_signals.py
+smoke_test_backend.py
+smoke_test_dashboard.py
+test_genai_import.py
+pytest_runner.py
+git_inspect.py
+git_inspect_out.py
+git_init_and_inspect.py
+git_diff_inspect.py
+git_read_origin.py
+git_release.py
+git_inspect_result.txt
+git_diff_result.txt
+origin_readme.txt
+
+# ── Session output artefacts ──────────────────────────────────────────────────
+formula_audit_report.txt
+genai_import_result.txt
+genai_models_found.txt
+http_probe_result.txt
+pip_install_log.txt
+pytest_output.txt
+pytest_result.txt
+smoke_test_results.txt
+streamlit_out.txt
+streamlit_*.log
+*.protected_hashes.json
+
+# ── ZIP packages (built outside the repo) ────────────────────────────────────
+*.zip
+
+# ── OS files ──────────────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
+desktop.ini

@@ -1,0 +1,16 @@
+============================================================
+PL CAPITAL — GIT RELEASE
+============================================================
+Remote origin: https://github.com/prataprishi0707/PL-Capital-Portfolio-Analytics-Agent.git
+
+Creating branch 'final-release' at origin/main SHA...
+[OK] git branch final-release origin/main
+       branch 'final-release' set up to track 'origin/main'.
+[FAIL] git checkout final-release
+  ERR: error: The following untracked working tree files would be overwritten by checkout:
+	.gitignore
+	README.md
+	dashboard/app.py
+	dashboard/pages/1_Portfolio_Explorer.py
+	dashboard/pages/2_Risk_Intelligen
+  FATAL: command failed (rc=1). Stopping.

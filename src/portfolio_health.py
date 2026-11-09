@@ -2,12 +2,13 @@
 import sqlite3
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-DB_PATH = PROJECT_ROOT / "portfolio_database.db"
+# Import security-enforcing connection helpers
+from database import get_connection, _authorizer
 
 
 def analyze_portfolio_health(portfolio_name):
-    conn = sqlite3.connect(DB_PATH)
+    conn = get_connection(read_only=True)
+    conn.set_authorizer(_authorizer)
     conn.row_factory = sqlite3.Row
 
     try:
@@ -235,10 +236,54 @@ def analyze_portfolio_health(portfolio_name):
         else:
             analysis_status = "holdings_only"
 
+        # 10. Compute health_score
+        # Formula:
+        #   Start: 100 pts
+        #   Deduct for each high risk alert:   -15 pts
+        #   Deduct for each medium risk alert: -8 pts
+        #   Deduct for high HHI (>0.5):        -15 pts (extremely concentrated)
+        #   Deduct for moderate HHI (>0.3):    -8 pts
+        #   Deduct for missing performance:    -10 pts
+        #   Deduct for missing risk metrics:   -10 pts
+        #   Deduct for allocation gap > 5%:    -5 pts
+        #   Floor: 0
+        health_score = 100
+        high_alert_count = sum(1 for a in alerts if a.get("severity") == "high")
+        medium_alert_count = sum(1 for a in alerts if a.get("severity") == "medium")
+        health_score -= high_alert_count * 15
+        health_score -= medium_alert_count * 8
+        if hhi is not None:
+            if hhi > 0.5:
+                health_score -= 15
+            elif hhi > 0.3:
+                health_score -= 8
+        if not performance:
+            health_score -= 10
+        if not risk:
+            health_score -= 10
+        if abs(unallocated_allocation) > 5:
+            health_score -= 5
+        health_score = max(0, health_score)
+
+        # Health tier based on score
+        if health_score >= 80:
+            health_tier = "healthy"
+        elif health_score >= 55:
+            health_tier = "moderate"
+        else:
+            health_tier = "attention_needed"
+
         return {
             "success": True,
             "portfolio": portfolio,
             "analysis_status": analysis_status,
+            "health_score": health_score,
+            "health_tier": health_tier,
+            "health_score_note": (
+                "health_score starts at 100. Deductions: "
+                "high alert -15, medium alert -8, HHI>0.5 -15, HHI>0.3 -8, "
+                "missing performance -10, missing risk -10, allocation gap>5% -5. Floor: 0."
+            ),
             "performance": performance,
             "risk_metrics": risk,
             "asset_allocation": allocation,

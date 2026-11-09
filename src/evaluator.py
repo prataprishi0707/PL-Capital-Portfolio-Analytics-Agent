@@ -82,16 +82,105 @@ def normalize_rows(rows):
     return sorted(normalized, key=str)
 
 
-def compare_results(actual, expected):
+def compare_results(actual, expected, order_sensitive=False,
+                    rel_tol=1e-6, abs_tol=1e-4):
+    """Compare SQL results with schema, row-count and numeric validation."""
+
+    import math
+    import numbers
+
+    if not isinstance(actual, dict) or not isinstance(expected, dict):
+        return False
 
     if not actual.get("success") or not expected.get("success"):
         return False
 
-    actual_rows = actual.get("rows", [])
-    expected_rows = expected.get("rows", [])
+    actual_rows = actual.get("rows")
+    expected_rows = expected.get("rows")
 
-    return normalize_rows(actual_rows) == normalize_rows(expected_rows)
+    if not isinstance(actual_rows, list) or not isinstance(expected_rows, list):
+        return False
 
+    if len(actual_rows) != len(expected_rows):
+        return False
+
+    def normalize_row(row):
+        if not isinstance(row, dict):
+            return None
+
+        normalized = {}
+
+        for column, value in row.items():
+            key = str(column).strip().casefold()
+
+            if not key or key in normalized:
+                return None
+
+            normalized[key] = value
+
+        return normalized
+
+    def values_equal(a, b):
+        if a is None or b is None:
+            return a is None and b is None
+
+        if isinstance(a, bool) or isinstance(b, bool):
+            return type(a) is type(b) and a == b
+
+        if isinstance(a, numbers.Real) and isinstance(b, numbers.Real):
+            try:
+                a = float(a)
+                b = float(b)
+
+                if not math.isfinite(a) or not math.isfinite(b):
+                    return False
+
+                return math.isclose(
+                    a, b,
+                    rel_tol=rel_tol,
+                    abs_tol=abs_tol
+                )
+            except (TypeError, ValueError, OverflowError):
+                return False
+
+        return str(a).strip().casefold() == str(b).strip().casefold()
+
+    def rows_equal(a, b):
+        a = normalize_row(a)
+        b = normalize_row(b)
+
+        if a is None or b is None:
+            return False
+
+        if set(a) != set(b):
+            return False
+
+        return all(values_equal(a[key], b[key]) for key in a)
+
+    if order_sensitive:
+        return all(
+            rows_equal(a, b)
+            for a, b in zip(actual_rows, expected_rows)
+        )
+
+    # Unordered comparison with duplicate-row preservation.
+    unmatched = list(expected_rows)
+
+    for actual_row in actual_rows:
+        match_index = next(
+            (
+                i for i, expected_row in enumerate(unmatched)
+                if rows_equal(actual_row, expected_row)
+            ),
+            None
+        )
+
+        if match_index is None:
+            return False
+
+        unmatched.pop(match_index)
+
+    return len(unmatched) == 0
 
 def evaluate_exposure(question, actual_result=None):
 
@@ -166,7 +255,13 @@ def evaluate_sql(question, client, model_name, schema_description):
         question["ground_truth"]["sql_query"]
     )
 
-    passed = compare_results(actual, expected)
+    passed = compare_results(
+        actual,
+        expected,
+        order_sensitive=(
+            "ORDER BY" in question["ground_truth"]["sql_query"].upper()
+        )
+    )
 
     return {
         "success": actual.get("success", False),

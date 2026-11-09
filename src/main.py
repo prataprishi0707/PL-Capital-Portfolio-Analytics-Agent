@@ -76,9 +76,12 @@ def main():
     try:
         client = genai.Client(api_key=api_key)
 
+        # Override via GEMINI_MODEL env var.
+        # Default: gemini-2.5-flash — verified present in google-genai SDK 1.64.0 source.
+        # Fallback options (older but stable): gemini-1.5-flash, gemini-2.0-flash-lite.
         model_name = os.getenv(
             "GEMINI_MODEL",
-            "gemini-3.8-flash"
+            "gemini-2.5-flash"
         )
 
         schema_description = get_schema_description()
