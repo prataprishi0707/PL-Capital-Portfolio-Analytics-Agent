@@ -1,0 +1,320 @@
+================================================================================
+PL CAPITAL — FULL PORTFOLIO RECONCILIATION REPORT (v2, strict validation)
+All 13 portfolios reconciled against the actual supplied database.
+
+Two independent DIAGNOSTIC comparisons are computed:
+  (A) Market-value weight = (qty * current_price) / sum(qty * current_price)
+  (B) Cost-basis weight   = cost_basis / sum(cost_basis)   [diagnostic]
+Both are compared against the recorded current_weight. Neither is claimed
+as historical truth. current_price is NOT the lot-purchase price used to
+size recorded AUM, so divergence between (A) and recorded weights does NOT
+imply data corruption — it is reported, not normalised.
+
+Statuses: MATCHED, OBSERVATION, DISCREPANCY_FOUND, INCOMPLETE, INVALID_DATA
+Thresholds: OBSERVATION >0.5pp, DISCREPANCY >2.0pp
+================================================================================
+
+Portfolio  1: Growth Equity Fund
+  Recorded AUM: ₹      25,000,000
+  STATUS:                DISCREPANCY_FOUND  (legacy: errors)
+  Data completeness:     100.0%
+  Holdings count:        8
+  Total market value:    ₹    2,204,148.00  (qty * current_price)
+  Total cost basis (diag):₹   1,986,850.00
+  Recorded AUM:          ₹      25,000,000
+  AUM coverage:          8.8%  (mkt val / AUM)  [MATCHED]
+  Recorded weights sum:  1.0  drift from 1.0 = 0.0  [MATCHED]
+  Per-holding — MATCHED:2  OBS:2  DISC:4  INCOMPLETE:0  INVALID:0
+  Validation errors: none
+  Largest drift: AMZN  rec=0.07  mkt=0.153347  cost-basis wt=0.1611  drift=+8.3347pp  [DISCREPANCY_FOUND]
+  Per-holding discrepancies (6):
+    [error  ] AMZN          rec=0.07  mkt=0.153347  cb=0.1611  drift=+8.3347pp
+    [error  ] MSFT          rec=0.22  mkt=0.150719  cb=0.1532  drift=+6.9281pp
+    [error  ] META          rec=0.12  mkt=0.088524  cb=0.0848  drift=+3.1476pp
+    [error  ] AAPL          rec=0.18  mkt=0.210399  cb=0.2204  drift=+3.0399pp
+    [warning] ORCL          rec=0.08  mkt=0.063072  cb=0.0596  drift=+1.6928pp
+    [warning] NVDA          rec=0.15  mkt=0.158846  cb=0.1450  drift=+0.8846pp
+
+Portfolio  2: Conservative Income Fund
+  Recorded AUM: ₹      18,500,000
+  STATUS:                DISCREPANCY_FOUND  (legacy: errors)
+  Data completeness:     100.0%
+  Holdings count:        7
+  Total market value:    ₹    1,162,520.00  (qty * current_price)
+  Total cost basis (diag):₹   1,127,330.00
+  Recorded AUM:          ₹      18,500,000
+  AUM coverage:          6.3%  (mkt val / AUM)  [MATCHED]
+  Recorded weights sum:  1.0  drift from 1.0 = 0.0  [MATCHED]
+  Per-holding — MATCHED:0  OBS:0  DISC:7  INCOMPLETE:0  INVALID:0
+  Validation errors: none
+  Largest drift: JPM  rec=0.15  mkt=0.374703  cost-basis wt=0.3732  drift=+22.4703pp  [DISCREPANCY_FOUND]
+  Per-holding discrepancies (7):
+    [error  ] JPM           rec=0.15  mkt=0.374703  cb=0.3732  drift=+22.4703pp
+    [error  ] UST-10Y       rec=0.25  mkt=0.044085  cb=0.0452  drift=+20.5915pp
+    [error  ] JNJ           rec=0.12  mkt=0.285242  cb=0.2846  drift=+16.5242pp
+    [error  ] UST-5Y        rec=0.2  mkt=0.068988  cb=0.0708  drift=+13.1012pp
+    [error  ] UST-2Y        rec=0.15  mkt=0.085805  cb=0.0883  drift=+6.4195pp
+    [error  ] PG            rec=0.05  mkt=0.107284  cb=0.1031  drift=+5.7284pp
+    [error  ] CORP-AAA-5Y   rec=0.08  mkt=0.033892  cb=0.0348  drift=+4.6108pp
+
+Portfolio  3: Tech Innovation Fund
+  Recorded AUM: ₹      32,000,000
+  STATUS:                DISCREPANCY_FOUND  (legacy: errors)
+  Data completeness:     100.0%
+  Holdings count:        8
+  Total market value:    ₹    1,565,292.50  (qty * current_price)
+  Total cost basis (diag):₹   1,506,832.00
+  Recorded AUM:          ₹      32,000,000
+  AUM coverage:          4.9%  (mkt val / AUM)  [OBSERVATION]
+  Recorded weights sum:  1.0  drift from 1.0 = 0.0  [MATCHED]
+  Per-holding — MATCHED:1  OBS:3  DISC:4  INCOMPLETE:0  INVALID:0
+  Validation errors: none
+  Largest drift: AAPL  rec=0.15  mkt=0.213315  cost-basis wt=0.2179  drift=+6.3315pp  [DISCREPANCY_FOUND]
+  Per-holding discrepancies (7):
+    [error  ] AAPL          rec=0.15  mkt=0.213315  cb=0.2179  drift=+6.3315pp
+    [error  ] ORCL          rec=0.1  mkt=0.044407  cb=0.0439  drift=+5.5593pp
+    [error  ] MSFT          rec=0.18  mkt=0.159175  cb=0.1613  drift=+2.0825pp
+    [error  ] GOOGL         rec=0.12  mkt=0.14059  cb=0.1423  drift=+2.059pp
+    [warning] NVDA          rec=0.15  mkt=0.167758  cb=0.1693  drift=+1.7758pp
+    [warning] META          rec=0.1  mkt=0.083103  cb=0.0785  drift=+1.6897pp
+    [warning] CRM           rec=0.12  mkt=0.107788  cb=0.1010  drift=+1.2212pp
+
+Portfolio  4: Balanced Portfolio
+  Recorded AUM: ₹      22,000,000
+  STATUS:                DISCREPANCY_FOUND  (legacy: errors)
+  Data completeness:     100.0%
+  Holdings count:        8
+  Total market value:    ₹    1,073,279.00  (qty * current_price)
+  Total cost basis (diag):₹   1,053,600.00
+  Recorded AUM:          ₹      22,000,000
+  AUM coverage:          4.9%  (mkt val / AUM)  [OBSERVATION]
+  Recorded weights sum:  1.0  drift from 1.0 = 0.0  [MATCHED]
+  Per-holding — MATCHED:0  OBS:0  DISC:8  INCOMPLETE:0  INVALID:0
+  Validation errors: none
+  Largest drift: UST-10Y  rec=0.25  mkt=0.057301  cost-basis wt=0.0582  drift=+19.2699pp  [DISCREPANCY_FOUND]
+  Per-holding discrepancies (8):
+    [error  ] UST-10Y       rec=0.25  mkt=0.057301  cb=0.0582  drift=+19.2699pp
+    [error  ] JPM           rec=0.08  mkt=0.20293  cb=0.2033  drift=+12.293pp
+    [error  ] UST-5Y        rec=0.18  mkt=0.084065  cb=0.0855  drift=+9.5935pp
+    [error  ] JNJ           rec=0.06  mkt=0.15448  cb=0.1540  drift=+9.448pp
+    [error  ] AAPL          rec=0.12  mkt=0.207402  cb=0.2056  drift=+8.7402pp
+    [error  ] MSFT          rec=0.1  mkt=0.154763  cb=0.1519  drift=+5.4763pp
+    [error  ] UST-2Y        rec=0.15  mkt=0.111527  cb=0.1134  drift=+3.8473pp
+    [error  ] CORP-AAA-5Y   rec=0.06  mkt=0.027532  cb=0.0280  drift=+3.2468pp
+
+Portfolio  5: ESG Sustainable Fund
+  Recorded AUM: ₹      15,000,000
+  STATUS:                OBSERVATION  (legacy: warnings)
+  Data completeness:     100.0%
+  Holdings count:        7
+  Total market value:    ₹    1,007,228.00  (qty * current_price)
+  Total cost basis (diag):₹     976,580.00
+  Recorded AUM:          ₹      15,000,000
+  AUM coverage:          6.7%  (mkt val / AUM)  [MATCHED]
+  Recorded weights sum:  1.0  drift from 1.0 = 0.0  [MATCHED]
+  Per-holding — MATCHED:4  OBS:3  DISC:0  INCOMPLETE:0  INVALID:0
+  Validation errors: none
+  Largest drift: WMT  rec=0.15  mkt=0.131291  cost-basis wt=0.1331  drift=+1.8709pp  [OBSERVATION]
+  Per-holding discrepancies (3):
+    [warning] WMT           rec=0.15  mkt=0.131291  cb=0.1331  drift=+1.8709pp
+    [warning] JNJ           rec=0.18  mkt=0.197532  cb=0.1964  drift=+1.7532pp
+    [warning] UNH           rec=0.2  mkt=0.206805  cb=0.2111  drift=+0.6805pp
+
+Portfolio  6: Small Cap Value Fund
+  Recorded AUM: ₹      12,000,000
+  STATUS:                DISCREPANCY_FOUND  (legacy: errors)
+  Data completeness:     100.0%
+  Holdings count:        5
+  Total market value:    ₹      758,085.00  (qty * current_price)
+  Total cost basis (diag):₹     754,090.00
+  Recorded AUM:          ₹      12,000,000
+  AUM coverage:          6.3%  (mkt val / AUM)  [MATCHED]
+  Recorded weights sum:  1.0  drift from 1.0 = 0.0  [MATCHED]
+  Per-holding — MATCHED:0  OBS:0  DISC:5  INCOMPLETE:0  INVALID:0
+  Validation errors: none
+  Largest drift: LLY  rec=0.25  mkt=0.431508  cost-basis wt=0.4303  drift=+18.1508pp  [DISCREPANCY_FOUND]
+  Per-holding discrepancies (5):
+    [error  ] LLY           rec=0.25  mkt=0.431508  cb=0.4303  drift=+18.1508pp
+    [error  ] BAC           rec=0.22  mkt=0.057282  cb=0.0555  drift=+16.2718pp
+    [error  ] MA            rec=0.15  mkt=0.203355  cb=0.2029  drift=+5.3355pp
+    [error  ] PFE           rec=0.18  mkt=0.140486  cb=0.1464  drift=+3.9514pp
+    [error  ] ABBV          rec=0.2  mkt=0.167369  cb=0.1649  drift=+3.2631pp
+
+Portfolio  7: International Equity Fund
+  Recorded AUM: ₹      28,000,000
+  STATUS:                DISCREPANCY_FOUND  (legacy: errors)
+  Data completeness:     100.0%
+  Holdings count:        8
+  Total market value:    ₹      734,928.00  (qty * current_price)
+  Total cost basis (diag):₹     718,691.00
+  Recorded AUM:          ₹      28,000,000
+  AUM coverage:          2.6%  (mkt val / AUM)  [OBSERVATION]
+  Recorded weights sum:  1.0  drift from 1.0 = 0.0  [MATCHED]
+  Per-holding — MATCHED:1  OBS:2  DISC:5  INCOMPLETE:0  INVALID:0
+  Validation errors: none
+  Largest drift: AAPL  rec=0.08  mkt=0.151443  cost-basis wt=0.1497  drift=+7.1443pp  [DISCREPANCY_FOUND]
+  Per-holding discrepancies (7):
+    [error  ] AAPL          rec=0.08  mkt=0.151443  cb=0.1497  drift=+7.1443pp
+    [error  ] MSFT          rec=0.06  mkt=0.113007  cb=0.1109  drift=+5.3007pp
+    [error  ] XOM           rec=0.18  mkt=0.134367  cb=0.1339  drift=+4.5633pp
+    [error  ] CVX           rec=0.2  mkt=0.172425  cb=0.1741  drift=+2.7575pp
+    [error  ] HD            rec=0.11  mkt=0.085954  cb=0.0870  drift=+2.4046pp
+    [warning] TSLA          rec=0.15  mkt=0.135251  cb=0.1368  drift=+1.4749pp
+    [warning] GOOGL         rec=0.12  mkt=0.112289  cb=0.1136  drift=+0.7711pp
+
+Portfolio  8: Fixed Income Plus
+  Recorded AUM: ₹      35,000,000
+  STATUS:                DISCREPANCY_FOUND  (legacy: errors)
+  Data completeness:     100.0%
+  Holdings count:        5
+  Total market value:    ₹      589,225.00  (qty * current_price)
+  Total cost basis (diag):₹     588,160.00
+  Recorded AUM:          ₹      35,000,000
+  AUM coverage:          1.7%  (mkt val / AUM)  [OBSERVATION]
+  Recorded weights sum:  1.0  drift from 1.0 = 0.0  [MATCHED]
+  Per-holding — MATCHED:1  OBS:1  DISC:3  INCOMPLETE:0  INVALID:0
+  Validation errors: none
+  Largest drift: UST-10Y  rec=0.35  mkt=0.173957  cost-basis wt=0.1739  drift=+17.6043pp  [DISCREPANCY_FOUND]
+  Per-holding discrepancies (4):
+    [error  ] UST-10Y       rec=0.35  mkt=0.173957  cb=0.1739  drift=+17.6043pp
+    [error  ] UST-2Y        rec=0.2  mkt=0.33858  cb=0.3390  drift=+13.858pp
+    [error  ] CORP-AAA-5Y   rec=0.1  mkt=0.133735  cb=0.1336  drift=+3.3735pp
+    [warning] UST-5Y        rec=0.25  mkt=0.255208  cb=0.2550  drift=+0.5208pp
+
+Portfolio  9: Dividend Aristocrats Fund
+  Recorded AUM: ₹      20,000,000
+  STATUS:                DISCREPANCY_FOUND  (legacy: errors)
+  Data completeness:     100.0%
+  Holdings count:        4
+  Total market value:    ₹      944,180.00  (qty * current_price)
+  Total cost basis (diag):₹     927,620.00
+  Recorded AUM:          ₹      20,000,000
+  AUM coverage:          4.7%  (mkt val / AUM)  [OBSERVATION]
+  Recorded weights sum:  1.0  drift from 1.0 = 0.0  [MATCHED]
+  Per-holding — MATCHED:0  OBS:1  DISC:3  INCOMPLETE:0  INVALID:0
+  Validation errors: none
+  Largest drift: UNH  rec=0.3  mkt=0.441229  cost-basis wt=0.4471  drift=+14.1229pp  [DISCREPANCY_FOUND]
+  Per-holding discrepancies (4):
+    [error  ] UNH           rec=0.3  mkt=0.441229  cb=0.4471  drift=+14.1229pp
+    [error  ] WMT           rec=0.25  mkt=0.175073  cb=0.1771  drift=+7.4927pp
+    [error  ] PG            rec=0.25  mkt=0.19814  cb=0.1908  drift=+5.186pp
+    [warning] KO            rec=0.2  mkt=0.185558  cb=0.1850  drift=+1.4442pp
+
+Portfolio 10: Emerging Markets Fund
+  Recorded AUM: ₹      16,000,000
+  STATUS:                DISCREPANCY_FOUND  (legacy: errors)
+  Data completeness:     100.0%
+  Holdings count:        8
+  Total market value:    ₹    1,045,100.00  (qty * current_price)
+  Total cost basis (diag):₹   1,038,264.00
+  Recorded AUM:          ₹      16,000,000
+  AUM coverage:          6.5%  (mkt val / AUM)  [MATCHED]
+  Recorded weights sum:  1.0  drift from 1.0 = 0.0  [MATCHED]
+  Per-holding — MATCHED:1  OBS:4  DISC:3  INCOMPLETE:0  INVALID:0
+  Validation errors: none
+  Largest drift: NVDA  rec=0.1  mkt=0.067002  cost-basis wt=0.0686  drift=+3.2998pp  [DISCREPANCY_FOUND]
+  Per-holding discrepancies (7):
+    [error  ] NVDA          rec=0.1  mkt=0.067002  cb=0.0686  drift=+3.2998pp
+    [error  ] XOM           rec=0.12  mkt=0.141733  cb=0.1413  drift=+2.1733pp
+    [error  ] CRM           rec=0.1  mkt=0.121079  cb=0.1130  drift=+2.1079pp
+    [warning] CVX           rec=0.2  mkt=0.181877  cb=0.1837  drift=+1.8123pp
+    [warning] GOOGL         rec=0.07  mkt=0.052642  cb=0.0537  drift=+1.7358pp
+    [warning] AMZN          rec=0.15  mkt=0.161707  cb=0.1613  drift=+1.1707pp
+    [warning] TSLA          rec=0.18  mkt=0.190221  cb=0.1944  drift=+1.0221pp
+
+Portfolio 11: Total Stock Market Index Fund
+  Recorded AUM: ₹      45,000,000
+  STATUS:                DISCREPANCY_FOUND  (legacy: errors)
+  Data completeness:     100.0%
+  Holdings count:        12
+  Total market value:    ₹    6,622,340.00  (qty * current_price)
+  Total cost basis (diag):₹   6,533,580.00
+  Recorded AUM:          ₹      45,000,000
+  AUM coverage:          14.7%  (mkt val / AUM)  [MATCHED]
+  Recorded weights sum:  0.98  drift from 1.0 = 0.02  [DISCREPANCY_FOUND]
+  Per-holding — MATCHED:7  OBS:4  DISC:1  INCOMPLETE:0  INVALID:0
+  Validation errors: none
+  Largest drift: AMZN  rec=0.1  mkt=0.153118  cost-basis wt=0.1570  drift=+5.3118pp  [DISCREPANCY_FOUND]
+  Per-holding discrepancies (5):
+    [error  ] AMZN          rec=0.1  mkt=0.153118  cb=0.1570  drift=+5.3118pp
+    [warning] JNJ           rec=0.08  mkt=0.062591  cb=0.0619  drift=+1.7409pp
+    [warning] META          rec=0.05  mkt=0.039285  cb=0.0365  drift=+1.0715pp
+    [warning] AAPL          rec=0.15  mkt=0.140056  cb=0.1387  drift=+0.9944pp
+    [warning] MSFT          rec=0.12  mkt=0.125412  cb=0.1233  drift=+0.5412pp
+  Allocation drift flag: recorded_total=0.98  drift=0.02  [ERROR]
+
+Portfolio 12: Total Bond Market Index Fund
+  Recorded AUM: ₹      30,000,000
+  STATUS:                DISCREPANCY_FOUND  (legacy: errors)
+  Data completeness:     100.0%
+  Holdings count:        5
+  Total market value:    ₹      999,625.00  (qty * current_price)
+  Total cost basis (diag):₹     999,050.00
+  Recorded AUM:          ₹      30,000,000
+  AUM coverage:          3.3%  (mkt val / AUM)  [OBSERVATION]
+  Recorded weights sum:  1.0  drift from 1.0 = 0.0  [MATCHED]
+  Per-holding — MATCHED:3  OBS:0  DISC:2  INCOMPLETE:0  INVALID:0
+  Validation errors: none
+  Largest drift: UST-2Y  rec=0.2  mkt=0.249469  cost-basis wt=0.2497  drift=+4.9469pp  [DISCREPANCY_FOUND]
+  Per-holding discrepancies (2):
+    [error  ] UST-2Y        rec=0.2  mkt=0.249469  cb=0.2497  drift=+4.9469pp
+    [error  ] UST-10Y       rec=0.25  mkt=0.205077  cb=0.2050  drift=+4.4923pp
+
+Portfolio 13: Total International Index Fund
+  Recorded AUM: ₹      25,000,000
+  STATUS:                DISCREPANCY_FOUND  (legacy: errors)
+  Data completeness:     100.0%
+  Holdings count:        10
+  Total market value:    ₹    2,281,686.00  (qty * current_price)
+  Total cost basis (diag):₹   2,243,656.00
+  Recorded AUM:          ₹      25,000,000
+  AUM coverage:          9.1%  (mkt val / AUM)  [MATCHED]
+  Recorded weights sum:  1.0  drift from 1.0 = 0.0  [MATCHED]
+  Per-holding — MATCHED:0  OBS:0  DISC:10  INCOMPLETE:0  INVALID:0
+  Validation errors: none
+  Largest drift: MSFT  rec=0.06  mkt=0.145598  cost-basis wt=0.1431  drift=+8.5598pp  [DISCREPANCY_FOUND]
+  Per-holding discrepancies (10):
+    [error  ] MSFT          rec=0.06  mkt=0.145598  cb=0.1431  drift=+8.5598pp
+    [error  ] AAPL          rec=0.08  mkt=0.162599  cb=0.1612  drift=+8.2599pp
+    [error  ] GOOGL         rec=0.05  mkt=0.12056  cb=0.1221  drift=+7.056pp
+    [error  ] CVX           rec=0.15  mkt=0.104134  cb=0.1055  drift=+4.5866pp
+    [error  ] NVDA          rec=0.12  mkt=0.076724  cb=0.0782  drift=+4.3276pp
+    [error  ] AVGO          rec=0.08  mkt=0.046026  cb=0.0460  drift=+3.3974pp
+    [error  ] XOM           rec=0.12  mkt=0.086559  cb=0.0877  drift=+3.3441pp
+    [error  ] AMZN          rec=0.15  mkt=0.118509  cb=0.1205  drift=+3.1491pp
+    [error  ] CRM           rec=0.1  mkt=0.073945  cb=0.0686  drift=+2.6055pp
+    [error  ] TSLA          rec=0.09  mkt=0.065346  cb=0.0672  drift=+2.4654pp
+
+================================================================================
+SUMMARY TABLE
+================================================================================
+ID  Portfolio                            Status             MktVal(M)   AUM(M)   AUM%  AllocDrift  MaxDrift(pp)  Disc#  Comp%
+-----------------------------------------------------------------------------------------------------------------------------
+ 1  Growth Equity Fund                   DISCREPANCY_FOUND        2.2     25.0    8.8      0.0000      +8.3347     6    100
+ 2  Conservative Income Fund             DISCREPANCY_FOUND        1.2     18.5    6.3      0.0000     +22.4703     7    100
+ 3  Tech Innovation Fund                 DISCREPANCY_FOUND        1.6     32.0    4.9      0.0000      +6.3315     7    100
+ 4  Balanced Portfolio                   DISCREPANCY_FOUND        1.1     22.0    4.9      0.0000     +19.2699     8    100
+ 5  ESG Sustainable Fund                 OBSERVATION              1.0     15.0    6.7      0.0000      +1.8709     3    100
+ 6  Small Cap Value Fund                 DISCREPANCY_FOUND        0.8     12.0    6.3      0.0000     +18.1508     5    100
+ 7  International Equity Fund            DISCREPANCY_FOUND        0.7     28.0    2.6      0.0000      +7.1443     7    100
+ 8  Fixed Income Plus                    DISCREPANCY_FOUND        0.6     35.0    1.7      0.0000     +17.6043     4    100
+ 9  Dividend Aristocrats Fund            DISCREPANCY_FOUND        0.9     20.0    4.7      0.0000     +14.1229     4    100
+10  Emerging Markets Fund                DISCREPANCY_FOUND        1.0     16.0    6.5      0.0000      +3.2998     7    100
+11  Total Stock Market Index Fund        DISCREPANCY_FOUND        6.6     45.0   14.7      0.0200      +5.3118     5    100
+12  Total Bond Market Index Fund         DISCREPANCY_FOUND        1.0     30.0    3.3      0.0000      +4.9469     2    100
+13  Total International Index Fund       DISCREPANCY_FOUND        2.3     25.0    9.1      0.0000      +8.5598    10    100
+
+STATUS TOTALS:
+  MATCHED: 0
+  OBSERVATION: 1
+  DISCREPANCY_FOUND: 12
+  INCOMPLETE: 0
+  INVALID_DATA: 0
+  FAILED: 0
+
+NOTE: All 13 portfolios show DISCREPANCY_FOUND between recorded weights and
+market-value weights because securities.current_price reflects prices at a
+different point in time than when current_weight was calibrated. This is a
+property of the static dataset, reported honestly — NOT claimed as data
+corruption. The cost-basis diagnostic comparison is provided separately and
+labelled as diagnostic, not historical truth.
